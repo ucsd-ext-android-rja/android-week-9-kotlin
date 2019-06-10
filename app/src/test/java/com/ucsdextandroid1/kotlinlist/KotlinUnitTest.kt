@@ -1,8 +1,11 @@
 package com.ucsdextandroid1.kotlinlist
 
+import android.graphics.Color
+import android.view.View
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
+import kotlin.Comparator
 import kotlin.test.assertNotEquals
 
 /**
@@ -16,7 +19,7 @@ class KotlinUnitTest {
      * example 1: syntax
      * private String helloWorld() { return "Hello World"; }
      */
-    private fun helloWorld(): Any? = TODO()
+    private fun helloWorld(): String = "Hello World"
 
     @Test
     fun example_1_test() {
@@ -27,7 +30,9 @@ class KotlinUnitTest {
      * example 2: named arguments
      * Using named arguments join the string with a " " separator and a ! postfix
      */
-    private fun joinOptions(options: Collection<String>) = options.joinToString(TODO())
+    private fun joinOptions(options: Collection<String>) = options.joinToString(
+            separator = " ", postfix = "!"
+    )
 
     @Test
     fun example_2_test() {
@@ -41,7 +46,7 @@ class KotlinUnitTest {
      * Add default month 1
      * Add default year 2000
      */
-    private fun createDate(day: Int = TODO(), month: Int = TODO(), year: Int = TODO()) = "$month/$day/$year"
+    private fun createDate(day: Int = 1, month: Int = 1, year: Int = 2000) = "$month/$day/$year"
 
     @Test
     fun example_3_test() {
@@ -54,17 +59,19 @@ class KotlinUnitTest {
     /**
      * example 4: lambdas
      *
-     * Add code to the lambda function that returns true if the number is a boolean. In Java the
+     * Add code to the lambda function that returns true if the number is even. In Java the
      * code would look something like this
      *
      * collection.any(item -> { return item % 2 == 0; });
      */
-    private fun containsAnyEvenNumbers(collection: Collection<Int>): Boolean = collection.any { TODO() }
+    private fun containsAnyEvenNumbers(collection: Collection<Int>): Boolean = collection.any {
+        it % 2 == 0
+    }
 
     @Test
     fun example_4_test() {
-        assertEquals(true, listOf(2, 4, 6))
-        assertEquals(false, listOf(1, 3, 5, 7))
+        assertEquals(true, containsAnyEvenNumbers(listOf(2, 4, 6)))
+        assertEquals(false, containsAnyEvenNumbers(listOf(1, 3, 5, 7)))
     }
 
     /**
@@ -94,20 +101,20 @@ class KotlinUnitTest {
      *      }
      * }
      */
-    class Person //TODO
+    data class Person(val name: String, var age: Int)
 
     @Test
     fun example_5_test() {
         //TODO uncomment this code to test
-//        val person = Person("rj", 26)
-//
-//        assertEquals("rj", person.name)
-//        assertEquals(26, person.age)
-//
-//        assertEquals(Person("rj", 26), person)
-//
-//        person.age = 27
-//        assertEquals(27, person.age)
+        val person = Person("rj", 26)
+
+        assertEquals("rj", person.name)
+        assertEquals(26, person.age)
+
+        assertEquals(Person("rj", 26), person)
+
+        person.age = 27
+        assertEquals(27, person.age)
     }
 
     class School(val classroom: Classroom?)
@@ -128,7 +135,7 @@ class KotlinUnitTest {
      *
      */
     private fun getAllStudentNames(school: School?): List<String> {
-        return TODO()
+        return school?.classroom?.students?.map { it.name } ?: emptyList()
     }
 
     @Test
@@ -165,8 +172,8 @@ class KotlinUnitTest {
 
     private fun getNameOrSpecies(animalOrHuman: Any): String {
         return when(animalOrHuman) {
-            is Animal -> TODO()
-            // add human case
+            is Animal -> animalOrHuman.species
+            is Human -> animalOrHuman.name
             else -> throw IllegalArgumentException("Unknown")
         }
     }
@@ -194,7 +201,12 @@ class KotlinUnitTest {
      */
 
     private fun Random.toRandomColor(): Int {
-        TODO()
+        return Color.argb(
+                255,
+                this.nextInt(256),
+                this.nextInt(256),
+                this.nextInt(256)
+        )
     }
 
     @Test
@@ -223,7 +235,15 @@ class KotlinUnitTest {
 
     fun getSortedListWithObjectNotation(item1: Int, item2: Int, item3: Int): List<Int> {
         val arrayList = listOf(item1, item2, item3)
-        Collections.sort(arrayList, TODO())
+
+        Collections.sort(arrayList, object : Comparator<Int> {
+
+            override fun compare(x: Int, y: Int): Int {
+                return y - x
+            }
+
+        })
+
         return arrayList
     }
 
@@ -240,7 +260,13 @@ class KotlinUnitTest {
      */
     fun getSortedListWithLambdaNotation(item1: Int, item2: Int, item3: Int): List<Int> {
         val arrayList = listOf(item1, item2, item3)
-        Collections.sort(arrayList, TODO())
+
+//        Collections.sort(arrayList) { x, y -> y - x }
+
+        Collections.sort(arrayList) { x: Int, y: Int ->
+            return@sort y - x
+        }
+
         return arrayList
     }
 
@@ -252,15 +278,21 @@ class KotlinUnitTest {
     }
 
     class PropertyDemo {
-        private var _counter = 0
 
-        val count: Int get() = TODO()
+        var count: Int = 0
+            private set
 
         var propertyWithCounter: String? = null
             set(property) {
                 field = property
-                TODO("iterate counter")
+                count += 1
             }
+
+        val countWithProperty: String get() = "$propertyWithCounter $count"
+
+        fun getCountAndProperty(): String {
+            return "$count $propertyWithCounter"
+        }
     }
 
     @Test
